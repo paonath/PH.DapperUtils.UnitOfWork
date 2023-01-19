@@ -12,6 +12,12 @@ namespace PH.DapperUtils.UnitOfWork
 	/// <seealso cref="IUnitOfWork" />
 	public interface IDapperUnitOfWork : IUnitOfWork
 	{
+		/// <summary>
+		/// Gets the cancellation token source.
+		/// </summary>
+		/// <value>
+		/// The cancellation token source.
+		/// </value>
 		CancellationTokenSource CancellationTokenSource { get; }
 	}
 }
