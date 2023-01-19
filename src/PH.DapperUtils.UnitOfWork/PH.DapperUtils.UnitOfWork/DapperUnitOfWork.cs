@@ -16,6 +16,8 @@ namespace PH.DapperUtils.UnitOfWork
 {
 	/// <summary>
 	/// Dapper Unit Of Work
+	///
+	/// <para><see cref="IDisposable">IDisposable Wrapper</see> for hiding <see cref="IDbConnection"/> and <see cref="IDbTransaction"/> exposing only dapper method for data manipulation</para>
 	/// </summary>
 	/// <seealso cref="PH.DapperUtils.UnitOfWork.DapperBase" />
 	/// <seealso cref="PH.DapperUtils.UnitOfWork.IDapperUnitOfWork" />

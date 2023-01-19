@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace PH.DapperUtils.UnitOfWork
@@ -11,5 +12,6 @@ namespace PH.DapperUtils.UnitOfWork
 	/// <seealso cref="IUnitOfWork" />
 	public interface IDapperUnitOfWork : IUnitOfWork
 	{
+		CancellationTokenSource CancellationTokenSource { get; }
 	}
 }

@@ -23,7 +23,12 @@ namespace PH.DapperUtils.UnitOfWork
 
 		private IDbConnection GetConn()
 		{
-			CancellationToken.ThrowIfCancellationRequested();
+			if (CancellationToken.IsCancellationRequested)
+			{
+				Dispose(true);
+				CancellationToken.ThrowIfCancellationRequested();
+			}
+
 			return _conn;
 		}
 
@@ -35,7 +40,7 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <value>
 		/// The cancellation token.
 		/// </value>
-		public CancellationToken CancellationToken { get; set; }
+		internal CancellationToken CancellationToken { get; set; }
 
 		/// <summary>
 		/// Gets a value indicating whether this <see cref="DapperBase"/> is disposed.
@@ -71,6 +76,14 @@ namespace PH.DapperUtils.UnitOfWork
 
 
 		/// <summary>
+		/// Gets the cancellation token source.
+		/// </summary>
+		/// <value>
+		/// The cancellation token source.
+		/// </value>
+		public CancellationTokenSource CancellationTokenSource { get; }
+
+		/// <summary>
 		/// Initializes a new instance of the <see cref="DapperBase"/> class.
 		/// </summary>
 		/// <param name="dbConnection">The database connection.</param>
@@ -91,8 +104,10 @@ namespace PH.DapperUtils.UnitOfWork
 			Id            = id            ?? throw new ArgumentNullException(nameof(id));
 			Disposed      = false;
 
-			CancellationToken = cancellationToken;
-			Active            = true;
+			CancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(new []{ cancellationToken });
+			CancellationToken       = CancellationTokenSource.Token;
+
+			Active                  = true;
 		}
 
 		internal bool IfReadOnly()
@@ -137,6 +152,7 @@ namespace PH.DapperUtils.UnitOfWork
 			if (disposing && !Disposed)
 			{
 				Disposed = true;
+				Active   = false;
 				_conn?.Dispose();
 				DbTransaction?.Dispose();
 			}

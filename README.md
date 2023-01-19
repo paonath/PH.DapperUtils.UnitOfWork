@@ -1,4 +1,5 @@
 # PH.DapperUtils.UnitOfWork
+DapperUnitOfWork is a `IDisposable` wrapper for hiding `IDbConnection` and `IDbTransaction` exposing only dapper method for data manipulation and `Commit()` or `RollBack()`
 
 ## How to use
 
