@@ -1,0 +1,63 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageId>PH.DapperUtils.UnitOfWork</PackageId>
+
+
+    <Description>
+      Unit Of Work for Dapper
+
+    </Description>
+    <PackageReleaseNotes>
+    </PackageReleaseNotes>
+
+
+    <PackageTags>dapper, unit of work,database,sql,connection, transaction</PackageTags>
+
+    <PackageVersion>0.0.1</PackageVersion>
+    <AssemblyVersion>0.0.1</AssemblyVersion>
+    <FileVersion>0.0.1</FileVersion>
+    <Version>0.0.1</Version>
+
+    <Authors>Paolo Innocenti</Authors>
+    <Copyright>Copyright PH $([System.DateTime]::UtcNow.ToString("yyyy")) (c) paonath@gmail.com. All rights reserved.</Copyright>
+    <RepositoryUrl>https://github.com/paonath/PH.DapperUtils.UnitOfWork</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/paonath/PH.DapperUtils.UnitOfWork</PackageProjectUrl>
+
+
+    <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
+
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <Target Name="PopulateInfo" DependsOnTargets="GitInfo" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <RepositoryBranch>$(GitBranch)</RepositoryBranch>
+      <RepositoryCommit>$(GitCommit)</RepositoryCommit>
+      <RepositoryTag>$(GitBaseTag)</RepositoryTag>
+      <SourceRevisionId>$(Configuration) $([System.DateTime]::UtcNow.ToString("yyyyMMdd"))_$(GitCommit)_$(GitBaseTag)</SourceRevisionId>
+    </PropertyGroup>
+  </Target>
+
+  <ItemGroup>
+    <PackageReference Include="GitInfo" Version="2.3.0" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="[2.0.123,)" />
+    <PackageReference Include="Dapper.Contrib" Version="[2.0.78,)" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="nuget_es_img.png" Pack="true" PackagePath="" />
+  </ItemGroup>
+  <PropertyGroup>
+    <PackageIcon>nuget_es_img.png</PackageIcon>
+  </PropertyGroup>
+</Project>
