@@ -7,7 +7,24 @@ using System.Threading.Tasks;
 
 namespace PH.DapperUtils.UnitOfWork.SqlServerLocalDbTest
 {
-	public class Person
+	[TableName("persons")]
+    public class PersonWithAttributeMap
+    {
+		[FieldName("Id", true)]
+        public int    Key        { get; set; }
+		
+        [FieldName("FirstName")]
+        public string Identifier { get; set; }
+
+        [FieldName("LastName")]
+        public string AlternateIdentifier { get; set; }
+
+		[ExcludedField]
+        public Guid? NotMappedField { get; set; }
+    }
+
+
+    public class Person
 	{
 		[Key]
 		public int Id { get; set; }

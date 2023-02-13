@@ -135,11 +135,28 @@ namespace PH.DapperUtils.UnitOfWork.SqlServerLocalDbTest
         {
             using var uow              = await GetUnitOfWorkAsync();
             var       crud             = new Crud(uow);
+
+
+            Guid guid = Guid.NewGuid();
+            PersonWithAttributeMap byAttr = new PersonWithAttributeMap()
+                { NotMappedField = guid, AlternateIdentifier = $"F {guid}", Identifier = $"I {guid}" };
+
+            await crud.InsertEntityAsync(byAttr);
+            Assert.True(byAttr.Key > 0);
+            
+            
             var       id               = 0;
 
             var       personToFullCrud = new Person() { FirstName = "To Insert", LastName = "To Insert" };
             await crud.InsertEntityAsync(personToFullCrud);
             id = personToFullCrud.Id;
+
+           
+
+            var p = "select * from persons where Id = @Val";
+            var q = await crud.QuerySingleOrDefaultAsync<PersonWithAttributeMap>(p, new { Val = byAttr.Key });
+            Assert.NotNull(q);
+
 
             Assert.True(id > 0);
 

@@ -181,16 +181,25 @@ namespace PH.DapperUtils.UnitOfWork
 
         internal MapConfig DictionaryMap;
 
-
-        internal TableConfig GetTableConfigConfig<T>(T entity) where T : class
+        private  TableConfig RuntimeBuildTableConfigForType<T>(T entity, Type eType) where T : class
         {
-            var eType = entity.GetType();
-            if (!DictionaryMap.Tables.ContainsKey(eType))
-            {
                 var props = eType.GetProperties();
                 var l     = new List<FieldConfig>();
                 foreach (var propertyInfo in props)
                 {
+				    var excluded = propertyInfo.GetCustomAttribute<ExcludedFieldAttribute>();
+                    if (null != excluded)
+                    {
+						continue;
+                    }
+
+                    var byAttr = propertyInfo.GetCustomAttribute<FieldNameAttribute>();
+                    if (null != byAttr)
+                    {
+						l.Add(byAttr.Field);
+						continue;
+                    }
+
                     var parameter   = Expression.Parameter(eType);
                     var property    = Expression.Property(parameter, propertyInfo);
                     var conversion  = Expression.Convert(property, typeof(object));
@@ -241,13 +250,30 @@ namespace PH.DapperUtils.UnitOfWork
                     
                 }
 
-                var tbl = $"{eType.Name.ToLowerInvariant()}";
+                var tblNameAttr = eType.GetCustomAttribute<TableNameAttribute>();
+                if (null != tblNameAttr)
+                {
+                    return new TableConfig() { TableName = tblNameAttr.TableName, Fields = l.ToArray() };
+                }
+
+
+                var tbl         = $"{eType.Name.ToLowerInvariant()}";
                 if (!tbl.EndsWith("s", StringComparison.InvariantCultureIgnoreCase))
                 {
                     tbl = $"{tbl}s";
                 }
 
-                DictionaryMap.Tables.Add(eType, new TableConfig() { TableName = tbl, Fields = l.ToArray() });
+                return new TableConfig() { TableName = tbl, Fields = l.ToArray() };
+
+        }
+
+        internal TableConfig GetTableConfigConfig<T>(T entity) where T : class
+        {
+            var eType = entity.GetType();
+            if (!DictionaryMap.Tables.ContainsKey(eType))
+            {
+                var t = RuntimeBuildTableConfigForType(entity, eType);
+                DictionaryMap.Tables.Add(eType, t);
             }
 
             return DictionaryMap.Tables[eType];

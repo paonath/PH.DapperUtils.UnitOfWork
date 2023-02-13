@@ -35,6 +35,8 @@ namespace PH.DapperUtils.UnitOfWork
         /// </value>
         public bool IsAssignedIfKey { get; set; }
 
+        
+
     }
 
     public static class FieldConfigExtensions

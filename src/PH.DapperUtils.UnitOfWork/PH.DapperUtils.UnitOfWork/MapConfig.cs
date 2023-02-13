@@ -21,6 +21,56 @@ namespace PH.DapperUtils.UnitOfWork
     {
     }
 
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+    public class TableNameAttribute : Attribute
+    {
+        public string        TableName;
+
+        public TableNameAttribute(string tableName)
+        {
+            if (string.IsNullOrWhiteSpace(value: tableName))
+            {
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(tableName));
+            }
+
+            TableName = tableName;
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+    public class FieldNameAttribute : Attribute
+    {
+        public FieldConfig Field;
+
+        public FieldNameAttribute(string sqlFieldName) : this(sqlFieldName, false)
+        {
+
+        }
+
+        public FieldNameAttribute(string sqlFieldName, bool isKey, bool isAssignedIfKey = false) :
+            this(new FieldConfig() { SqlFieldName = sqlFieldName, IsKey = isKey, IsAssignedIfKey = isAssignedIfKey })
+        {
+            if (string.IsNullOrWhiteSpace(value: sqlFieldName))
+            {
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(sqlFieldName));
+            }
+        }
+
+        public FieldNameAttribute(FieldConfig field)
+        {
+            if (field is null)
+            {
+                throw new ArgumentNullException(nameof(field));
+            }
+
+            Field = field;
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+    public class ExcludedFieldAttribute : Attribute
+    {
+    }
 
     public class TableConfig
     {
