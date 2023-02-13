@@ -17,7 +17,7 @@ namespace PH.DapperUtils.UnitOfWork
 	///
 	/// 
 	/// </summary>
-	public static partial class DapperUnitOfWorkSqlMapper
+	public static partial class CrudSqlMapper
 	{
 		/// <summary>
 		///     Execute parameterized SQL.
@@ -28,11 +28,11 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="commandTimeout">Number of seconds before command execution timeout.</param>
 		/// <param name="commandType">Is it a stored proc or a batch?</param>
 		/// <returns>The number of rows affected.</returns>
-		public static int Execute(this DapperBase uow, string sql, object param = null, int? commandTimeout = null,
+		public static int Execute(this Crud uow, string sql, object param = null, int? commandTimeout = null,
 		                          CommandType? commandType = null)
 		{
 			uow.ThrowIfReadOnly();
-			return uow.DbConnection.Execute(sql, param, uow.DbTransaction, commandTimeout, commandType);
+			return uow.Uow.DbConnection.Execute(sql, param, uow.Uow.DbTransaction, commandTimeout, commandType);
 		}
 
 
@@ -45,10 +45,10 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="commandTimeout">Number of seconds before command execution timeout.</param>
 		/// <param name="commandType">Is it a stored proc or a batch?</param>
 		/// <returns>The first cell selected as <see cref="object" />.</returns>
-		public static object ExecuteScalar(this DapperBase uow, string sql, object param = null,
+		public static object ExecuteScalar(this Crud uow, string sql, object param = null,
 		                                   int? commandTimeout = null,
 		                                   CommandType? commandType = null)
-			=> uow.DbConnection.ExecuteScalar(sql, param, uow.DbTransaction, commandTimeout, commandType);
+			=> uow.Uow.DbConnection.ExecuteScalar(sql, param, uow.Uow.DbTransaction, commandTimeout, commandType);
 
 
 		/// <summary>
@@ -61,10 +61,10 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="commandTimeout">Number of seconds before command execution timeout.</param>
 		/// <param name="commandType">Is it a stored proc or a batch?</param>
 		/// <returns>The first cell returned, as <typeparamref name="T" />.</returns>
-		public static T ExecuteScalar<T>(this DapperBase uow, string sql, object param = null,
+		public static T ExecuteScalar<T>(this Crud uow, string sql, object param = null,
 		                                 int? commandTimeout = null,
 		                                 CommandType? commandType = null)
-			=> uow.DbConnection.ExecuteScalar<T>(sql, param, uow.DbTransaction, commandTimeout, commandType);
+			=> uow.Uow.DbConnection.ExecuteScalar<T>(sql, param, uow.Uow.DbTransaction, commandTimeout, commandType);
 
 
 		/// <summary>
@@ -77,10 +77,10 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="commandTimeout">The command timeout (in seconds).</param>
 		/// <param name="commandType">The type of command to execute.</param>
 		/// <remarks>Note: each row can be accessed via "dynamic", or by casting to an IDictionary&lt;string,object&gt;</remarks>
-		public static IEnumerable<dynamic> Query(this DapperBase uow, string sql, object param = null,
+		public static IEnumerable<dynamic> Query(this Crud uow, string sql, object param = null,
 		                                         bool buffered = true,
 		                                         int? commandTimeout = null, CommandType? commandType = null) =>
-			uow.DbConnection.Query(sql, param, uow.DbTransaction, buffered, commandTimeout, commandType);
+			uow.Uow.DbConnection.Query(sql, param, uow.Uow.DbTransaction, buffered, commandTimeout, commandType);
 
 
 		/// <summary>
@@ -92,10 +92,10 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="commandTimeout">The command timeout (in seconds).</param>
 		/// <param name="commandType">The type of command to execute.</param>
 		/// <remarks>Note: the row can be accessed via "dynamic", or by casting to an IDictionary&lt;string,object&gt;</remarks>
-		public static dynamic QueryFirst(this DapperBase uow, string sql, object param = null,
+		public static dynamic QueryFirst(this Crud uow, string sql, object param = null,
 		                                 int? commandTimeout = null,
 		                                 CommandType? commandType = null) =>
-			uow.DbConnection.QueryFirst(sql, param, uow.DbTransaction, commandTimeout, commandType);
+			uow.Uow.DbConnection.QueryFirst(sql, param, uow.Uow.DbTransaction, commandTimeout, commandType);
 
 		/// <summary>
 		///     Return a dynamic object with properties matching the columns.
@@ -106,10 +106,10 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="commandTimeout">The command timeout (in seconds).</param>
 		/// <param name="commandType">The type of command to execute.</param>
 		/// <remarks>Note: the row can be accessed via "dynamic", or by casting to an IDictionary&lt;string,object&gt;</remarks>
-		public static dynamic QueryFirstOrDefault(this DapperBase uow, string sql, object param = null,
+		public static dynamic QueryFirstOrDefault(this Crud uow, string sql, object param = null,
 		                                          int? commandTimeout = null,
 		                                          CommandType? commandType = null) =>
-			uow.DbConnection.QueryFirstOrDefault(sql, param, uow.DbTransaction, commandTimeout, commandType);
+			uow.Uow.DbConnection.QueryFirstOrDefault(sql, param, uow.Uow.DbTransaction, commandTimeout, commandType);
 
 		/// <summary>
 		///     Return a dynamic object with properties matching the columns.
@@ -120,10 +120,10 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="commandTimeout">The command timeout (in seconds).</param>
 		/// <param name="commandType">The type of command to execute.</param>
 		/// <remarks>Note: the row can be accessed via "dynamic", or by casting to an IDictionary&lt;string,object&gt;</remarks>
-		public static dynamic QuerySingle(this DapperBase uow, string sql, object param = null,
+		public static dynamic QuerySingle(this Crud uow, string sql, object param = null,
 		                                  int? commandTimeout = null,
 		                                  CommandType? commandType = null) =>
-			uow.DbConnection.QuerySingle(sql, param, uow.DbTransaction, commandTimeout, commandType);
+			uow.Uow.DbConnection.QuerySingle(sql, param, uow.Uow.DbTransaction, commandTimeout, commandType);
 
 
 		/// <summary>
@@ -135,10 +135,10 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="commandTimeout">The command timeout (in seconds).</param>
 		/// <param name="commandType">The type of command to execute.</param>
 		/// <remarks>Note: the row can be accessed via "dynamic", or by casting to an IDictionary&lt;string,object&gt;</remarks>
-		public static dynamic QuerySingleOrDefault(this DapperBase uow, string sql, object param = null,
+		public static dynamic QuerySingleOrDefault(this Crud uow, string sql, object param = null,
 		                                           int? commandTimeout = null,
 		                                           CommandType? commandType = null) =>
-			uow.DbConnection.QuerySingleOrDefault(sql, param, uow.DbTransaction, commandTimeout, commandType);
+			uow.Uow.DbConnection.QuerySingleOrDefault(sql, param, uow.Uow.DbTransaction, commandTimeout, commandType);
 
 		/// <summary>
 		///     Executes a query, returning the data typed as <typeparamref name="T" />.
@@ -155,10 +155,10 @@ namespace PH.DapperUtils.UnitOfWork
 		///     column is assumed, otherwise an instance is
 		///     created per row, and a direct column-name===member-name mapping is assumed (case insensitive).
 		/// </returns>
-		public static IEnumerable<T> Query<T>(this DapperBase uow, string sql, object param = null,
+		public static IEnumerable<T> Query<T>(this Crud uow, string sql, object param = null,
 		                                      bool buffered = true,
 		                                      int? commandTimeout = null, CommandType? commandType = null)
-			=> uow.DbConnection.Query<T>(sql, param, uow.DbTransaction, buffered, commandTimeout, commandType);
+			=> uow.Uow.DbConnection.Query<T>(sql, param, uow.Uow.DbTransaction, buffered, commandTimeout, commandType);
 
 
 		/// <summary>
@@ -175,9 +175,9 @@ namespace PH.DapperUtils.UnitOfWork
 		///     column is assumed, otherwise an instance is
 		///     created per row, and a direct column-name===member-name mapping is assumed (case insensitive).
 		/// </returns>
-		public static T QueryFirst<T>(this DapperBase uow, string sql, object param = null, int? commandTimeout = null,
+		public static T QueryFirst<T>(this Crud uow, string sql, object param = null, int? commandTimeout = null,
 		                              CommandType? commandType = null)
-			=> uow.DbConnection.QueryFirst<T>(sql, param, uow.DbTransaction, commandTimeout, commandType);
+			=> uow.Uow.DbConnection.QueryFirst<T>(sql, param, uow.Uow.DbTransaction, commandTimeout, commandType);
 
 
 		/// <summary>
@@ -194,10 +194,10 @@ namespace PH.DapperUtils.UnitOfWork
 		///     column is assumed, otherwise an instance is
 		///     created per row, and a direct column-name===member-name mapping is assumed (case insensitive).
 		/// </returns>
-		public static T QueryFirstOrDefault<T>(this DapperBase uow, string sql, object param = null,
+		public static T QueryFirstOrDefault<T>(this Crud uow, string sql, object param = null,
 		                                       int? commandTimeout = null,
 		                                       CommandType? commandType = null)
-			=> uow.DbConnection.QueryFirstOrDefault<T>(sql, param, uow.DbTransaction, commandTimeout, commandType);
+			=> uow.Uow.DbConnection.QueryFirstOrDefault<T>(sql, param, uow.Uow.DbTransaction, commandTimeout, commandType);
 
 
 		/// <summary>
@@ -214,9 +214,9 @@ namespace PH.DapperUtils.UnitOfWork
 		///     column is assumed, otherwise an instance is
 		///     created per row, and a direct column-name===member-name mapping is assumed (case insensitive).
 		/// </returns>
-		public static T QuerySingle<T>(this DapperBase uow, string sql, object param = null, int? commandTimeout = null,
+		public static T QuerySingle<T>(this Crud uow, string sql, object param = null, int? commandTimeout = null,
 		                               CommandType? commandType = null)
-			=> uow.DbConnection.QuerySingle<T>(sql, param, uow.DbTransaction, commandTimeout, commandType);
+			=> uow.Uow.DbConnection.QuerySingle<T>(sql, param, uow.Uow.DbTransaction, commandTimeout, commandType);
 
 
 		/// <summary>
@@ -233,10 +233,10 @@ namespace PH.DapperUtils.UnitOfWork
 		///     column is assumed, otherwise an instance is
 		///     created per row, and a direct column-name===member-name mapping is assumed (case insensitive).
 		/// </returns>
-		public static T QuerySingleOrDefault<T>(this DapperBase uow, string sql, object param = null,
+		public static T QuerySingleOrDefault<T>(this Crud uow, string sql, object param = null,
 		                                        int? commandTimeout = null,
 		                                        CommandType? commandType = null)
-			=> uow.DbConnection.QuerySingleOrDefault<T>(sql, param, uow.DbTransaction, commandTimeout, commandType);
+			=> uow.Uow.DbConnection.QuerySingleOrDefault<T>(sql, param, uow.Uow.DbTransaction, commandTimeout, commandType);
 
 		/// <summary>
 		///     Executes a single-row query, returning the data typed as <paramref name="type" />.
@@ -254,10 +254,10 @@ namespace PH.DapperUtils.UnitOfWork
 		///     column is assumed, otherwise an instance is
 		///     created per row, and a direct column-name===member-name mapping is assumed (case insensitive).
 		/// </returns>
-		public static IEnumerable<object> Query(this DapperBase uow, Type type, string sql, object param = null,
+		public static IEnumerable<object> Query(this Crud uow, Type type, string sql, object param = null,
 		                                        bool buffered = true,
 		                                        int? commandTimeout = null, CommandType? commandType = null)
-			=> uow.DbConnection.Query(type, sql, param, uow.DbTransaction, buffered, commandTimeout, commandType);
+			=> uow.Uow.DbConnection.Query(type, sql, param, uow.Uow.DbTransaction, buffered, commandTimeout, commandType);
 
 
 		/// <summary>
@@ -275,10 +275,10 @@ namespace PH.DapperUtils.UnitOfWork
 		///     column is assumed, otherwise an instance is
 		///     created per row, and a direct column-name===member-name mapping is assumed (case insensitive).
 		/// </returns>
-		public static object QueryFirst(this DapperBase uow, Type type, string sql, object param = null,
+		public static object QueryFirst(this Crud uow, Type type, string sql, object param = null,
 		                                int? commandTimeout = null,
 		                                CommandType? commandType = null)
-			=> uow.DbConnection.QueryFirst(type, sql, param, uow.DbTransaction, commandTimeout, commandType);
+			=> uow.Uow.DbConnection.QueryFirst(type, sql, param, uow.Uow.DbTransaction, commandTimeout, commandType);
 
 
 		/// <summary>
@@ -296,10 +296,10 @@ namespace PH.DapperUtils.UnitOfWork
 		///     column is assumed, otherwise an instance is
 		///     created per row, and a direct column-name===member-name mapping is assumed (case insensitive).
 		/// </returns>
-		public static object QueryFirstOrDefault(this DapperBase uow, Type type, string sql, object param = null,
+		public static object QueryFirstOrDefault(this Crud uow, Type type, string sql, object param = null,
 		                                         int? commandTimeout = null,
 		                                         CommandType? commandType = null)
-			=> uow.DbConnection.QueryFirstOrDefault(type, sql, param, uow.DbTransaction, commandTimeout, commandType);
+			=> uow.Uow.DbConnection.QueryFirstOrDefault(type, sql, param, uow.Uow.DbTransaction, commandTimeout, commandType);
 
 		/// <summary>
 		///     Executes a single-row query, returning the data typed as <paramref name="type" />.
@@ -316,10 +316,10 @@ namespace PH.DapperUtils.UnitOfWork
 		///     column is assumed, otherwise an instance is
 		///     created per row, and a direct column-name===member-name mapping is assumed (case insensitive).
 		/// </returns>
-		public static object QuerySingle(this DapperBase uow, Type type, string sql, object param = null,
+		public static object QuerySingle(this Crud uow, Type type, string sql, object param = null,
 		                                 int? commandTimeout = null,
 		                                 CommandType? commandType = null)
-			=> uow.DbConnection.QuerySingle(type, sql, param, uow.DbTransaction, commandTimeout, commandType);
+			=> uow.Uow.DbConnection.QuerySingle(type, sql, param, uow.Uow.DbTransaction, commandTimeout, commandType);
 
 
 		/// <summary>
@@ -337,10 +337,10 @@ namespace PH.DapperUtils.UnitOfWork
 		///     column is assumed, otherwise an instance is
 		///     created per row, and a direct column-name===member-name mapping is assumed (case insensitive).
 		/// </returns>
-		public static object QuerySingleOrDefault(this DapperBase uow, Type type, string sql, object param = null,
+		public static object QuerySingleOrDefault(this Crud uow, Type type, string sql, object param = null,
 		                                          int? commandTimeout = null,
 		                                          CommandType? commandType = null)
-			=> uow.DbConnection.QuerySingleOrDefault(type, sql, param, uow.DbTransaction, commandTimeout,
+			=> uow.Uow.DbConnection.QuerySingleOrDefault(type, sql, param, uow.Uow.DbTransaction, commandTimeout,
 			                                         commandType);
 
 
@@ -352,10 +352,10 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="param">The parameters to use for this query.</param>
 		/// <param name="commandTimeout">Number of seconds before command execution timeout.</param>
 		/// <param name="commandType">Is it a stored proc or a batch?</param>
-		public static SqlMapper.GridReader QueryMultiple(this DapperBase uow, string sql, object param = null,
+		public static SqlMapper.GridReader QueryMultiple(this Crud uow, string sql, object param = null,
 		                                                 int? commandTimeout = null,
 		                                                 CommandType? commandType = null) =>
-			uow.DbConnection.QueryMultiple(sql, param, uow.DbTransaction, commandTimeout, commandType);
+			uow.Uow.DbConnection.QueryMultiple(sql, param, uow.Uow.DbTransaction, commandTimeout, commandType);
 
 
 		/// <summary>
@@ -375,11 +375,11 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="commandType">Is it a stored proc or a batch?</param>
 		/// <returns>An enumerable of <typeparamref name="TReturn" />.</returns>
 		public static IEnumerable<TReturn> Query<TFirst, TSecond, TReturn>(
-			this DapperBase uow, string sql, Func<TFirst, TSecond, TReturn> map,
+			this Crud uow, string sql, Func<TFirst, TSecond, TReturn> map,
 			object param = null, bool buffered = true,
 			string splitOn = "Id", int? commandTimeout = null,
 			CommandType? commandType = null)
-			=> uow.DbConnection.Query(sql, map, param, uow.DbTransaction, buffered, splitOn,
+			=> uow.Uow.DbConnection.Query(sql, map, param, uow.Uow.DbTransaction, buffered, splitOn,
 			                          commandTimeout, commandType);
 
 
@@ -400,10 +400,10 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="commandTimeout">Number of seconds before command execution timeout.</param>
 		/// <param name="commandType">Is it a stored proc or a batch?</param>
 		/// <returns>An enumerable of <typeparamref name="TReturn" />.</returns>
-		public static IEnumerable<TReturn> Query<TFirst, TSecond, TThird, TReturn>(this DapperBase uow,
+		public static IEnumerable<TReturn> Query<TFirst, TSecond, TThird, TReturn>(this Crud uow,
 			string sql, Func<TFirst, TSecond, TThird, TReturn> map, object param = null, bool buffered = true,
 			string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null)
-			=> uow.DbConnection.Query(sql, map, param, uow.DbTransaction, buffered, splitOn,
+			=> uow.Uow.DbConnection.Query(sql, map, param, uow.Uow.DbTransaction, buffered, splitOn,
 			                          commandTimeout, commandType);
 
 		/// <summary>
@@ -424,10 +424,10 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="commandTimeout">Number of seconds before command execution timeout.</param>
 		/// <param name="commandType">Is it a stored proc or a batch?</param>
 		/// <returns>An enumerable of <typeparamref name="TReturn" />.</returns>
-		public static IEnumerable<TReturn> Query<TFirst, TSecond, TThird, TFourth, TReturn>(this DapperBase uow,
+		public static IEnumerable<TReturn> Query<TFirst, TSecond, TThird, TFourth, TReturn>(this Crud uow,
 			string sql, Func<TFirst, TSecond, TThird, TFourth, TReturn> map, object param = null, bool buffered = true,
 			string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null)
-			=> uow.DbConnection.Query(sql, map, param, uow.DbTransaction, buffered,
+			=> uow.Uow.DbConnection.Query(sql, map, param, uow.Uow.DbTransaction, buffered,
 			                          splitOn, commandTimeout, commandType);
 
 
@@ -450,10 +450,10 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="commandTimeout">Number of seconds before command execution timeout.</param>
 		/// <param name="commandType">Is it a stored proc or a batch?</param>
 		/// <returns>An enumerable of <typeparamref name="TReturn" />.</returns>
-		public static IEnumerable<TReturn> Query<TFirst, TSecond, TThird, TFourth, TFifth, TReturn>(this DapperBase uow,
+		public static IEnumerable<TReturn> Query<TFirst, TSecond, TThird, TFourth, TFifth, TReturn>(this Crud uow,
 			string sql, Func<TFirst, TSecond, TThird, TFourth, TFifth, TReturn> map, object param = null,
 			bool buffered = true, string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null)
-			=> uow.DbConnection.Query(sql, map, param, uow.DbTransaction,
+			=> uow.Uow.DbConnection.Query(sql, map, param, uow.Uow.DbTransaction,
 			                          buffered, splitOn, commandTimeout, commandType);
 
 
@@ -478,11 +478,11 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="commandType">Is it a stored proc or a batch?</param>
 		/// <returns>An enumerable of <typeparamref name="TReturn" />.</returns>
 		public static IEnumerable<TReturn> Query<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TReturn>(
-			this DapperBase uow,
+			this Crud uow,
 			string sql, Func<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TReturn> map, object param = null,
 			bool buffered = true, string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null)
-			=> uow.DbConnection.Query(sql, map, param,
-			                          uow.DbTransaction, buffered, splitOn, commandTimeout, commandType);
+			=> uow.Uow.DbConnection.Query(sql, map, param,
+			                          uow.Uow.DbTransaction, buffered, splitOn, commandTimeout, commandType);
 
 
 		/// <summary>
@@ -507,12 +507,12 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="commandType">Is it a stored proc or a batch?</param>
 		/// <returns>An enumerable of <typeparamref name="TReturn" />.</returns>
 		public static IEnumerable<TReturn> Query<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh, TReturn>(
-			this DapperBase uow,
+			this Crud uow,
 			string sql, Func<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh, TReturn> map,
 			object param = null, bool buffered = true, string splitOn = "Id", int? commandTimeout = null,
 			CommandType? commandType = null)
-			=> uow.DbConnection.Query(sql, map, param,
-			                          uow.DbTransaction, buffered, splitOn, commandTimeout, commandType);
+			=> uow.Uow.DbConnection.Query(sql, map, param,
+			                          uow.Uow.DbTransaction, buffered, splitOn, commandTimeout, commandType);
 
 
 		/// <summary>
@@ -530,12 +530,12 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="commandTimeout">Number of seconds before command execution timeout.</param>
 		/// <param name="commandType">Is it a stored proc or a batch?</param>
 		/// <returns>An enumerable of <typeparamref name="TReturn" />.</returns>
-		public static IEnumerable<TReturn> Query<TReturn>(this DapperBase uow, string sql, Type[] types,
+		public static IEnumerable<TReturn> Query<TReturn>(this Crud uow, string sql, Type[] types,
 		                                                  Func<object[], TReturn> map,
 		                                                  object param = null, bool buffered = true,
 		                                                  string splitOn = "Id",
 		                                                  int? commandTimeout = null, CommandType? commandType = null)
-			=> uow.DbConnection.Query(sql, types, map, param, uow.DbTransaction, buffered, splitOn, commandTimeout,
+			=> uow.Uow.DbConnection.Query(sql, types, map, param, uow.Uow.DbTransaction, buffered, splitOn, commandTimeout,
 			                          commandType);
 
 
@@ -550,8 +550,8 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="id">Id of the entity to get, must be marked with [Key] attribute</param>
 		/// <param name="commandTimeout">Number of seconds before command execution timeout</param>
 		/// <returns>Entity of T</returns>
-		public static T Get<T>(this DapperBase uow, dynamic id, int? commandTimeout = null) where T : class =>
-			SqlMapperExtensions.Get<T>(uow.DbConnection, id, uow.DbTransaction,
+		public static T Get<T>(this Crud uow, dynamic id, int? commandTimeout = null) where T : class =>
+			SqlMapperExtensions.Get<T>(uow.Uow.DbConnection, id, uow.Uow.DbTransaction,
 			                           commandTimeout);
 
 		/// <summary>
@@ -564,8 +564,8 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="uow">Unit Of Work</param>
 		/// <param name="commandTimeout">Number of seconds before command execution timeout</param>
 		/// <returns>Entity of T</returns>
-		public static IEnumerable<T> GetAll<T>(this DapperBase uow, int? commandTimeout = null) where T : class =>
-			uow.DbConnection.GetAll<T>(uow.DbTransaction,
+		public static IEnumerable<T> GetAll<T>(this Crud uow, int? commandTimeout = null) where T : class =>
+			uow.Uow.DbConnection.GetAll<T>(uow.Uow.DbTransaction,
 			                           commandTimeout);
 
 
@@ -577,10 +577,10 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="entityToInsert">Entity to insert, can be list of entities</param>
 		/// <param name="commandTimeout">Number of seconds before command execution timeout</param>
 		/// <returns>Identity of inserted entity, or number of inserted rows if inserting a list</returns>
-		public static long Insert<T>(this DapperBase uow, T entityToInsert, int? commandTimeout = null) where T : class
+		public static long Insert<T>(this Crud uow, T entityToInsert, int? commandTimeout = null) where T : class
 		{
 			uow.ThrowIfReadOnly();
-			return uow.DbConnection.Insert(entityToInsert, uow.DbTransaction,
+			return uow.Uow.DbConnection.Insert(entityToInsert, uow.Uow.DbTransaction,
 			                               commandTimeout);
 		}
 
@@ -592,11 +592,11 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="entityToUpdate">Entity to be updated</param>
 		/// <param name="commandTimeout">Number of seconds before command execution timeout</param>
 		/// <returns>true if updated, false if not found or not modified (tracked entities)</returns>
-		public static bool Update<T>(this DapperBase uow, T entityToUpdate, int? commandTimeout = null) where T : class
+		public static bool Update<T>(this Crud uow, T entityToUpdate, int? commandTimeout = null) where T : class
 		{
 			uow.ThrowIfReadOnly();
-			return uow.DbConnection.Update(entityToUpdate,
-			                               uow.DbTransaction, commandTimeout);
+			return uow.Uow.DbConnection.Update(entityToUpdate,
+			                               uow.Uow.DbTransaction, commandTimeout);
 		}
 
 		/// <summary>
@@ -607,10 +607,10 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="entityToDelete">Entity to delete</param>
 		/// <param name="commandTimeout">Number of seconds before command execution timeout</param>
 		/// <returns>true if deleted, false if not found</returns>
-		public static bool Delete<T>(this DapperBase uow, T entityToDelete, int? commandTimeout = null) where T : class
+		public static bool Delete<T>(this Crud uow, T entityToDelete, int? commandTimeout = null) where T : class
 		{
 			uow.ThrowIfReadOnly();
-			return uow.DbConnection.Delete(entityToDelete, uow.DbTransaction,
+			return uow.Uow.DbConnection.Delete(entityToDelete, uow.Uow.DbTransaction,
 			                               commandTimeout);
 		}
 
@@ -621,10 +621,10 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="uow">Unit Of Work</param>
 		/// <param name="commandTimeout">Number of seconds before command execution timeout</param>
 		/// <returns>true if deleted, false if none found</returns>
-		public static bool DeleteAll<T>(this DapperBase uow, int? commandTimeout = null) where T : class
+		public static bool DeleteAll<T>(this Crud uow, int? commandTimeout = null) where T : class
 		{
 			uow.ThrowIfReadOnly();
-			return uow.DbConnection.DeleteAll<T>(uow.DbTransaction,
+			return uow.Uow.DbConnection.DeleteAll<T>(uow.Uow.DbTransaction,
 			                                     commandTimeout);
 		}
 	
@@ -640,10 +640,10 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="commandTimeout">The command timeout (in seconds).</param>
 		/// <param name="commandType">The type of command to execute.</param>
 		/// <remarks>Note: each row can be accessed via "dynamic", or by casting to an IDictionary&lt;string,object&gt;</remarks>
-		public static Task<IEnumerable<dynamic>> QueryAsync(this DapperBase uow, string sql, object param = null,
+		public static Task<IEnumerable<dynamic>> QueryAsync(this Crud uow, string sql, object param = null,
 		                                                    int? commandTimeout = null,
 		                                                    CommandType? commandType = null) =>
-			uow.DbConnection.QueryAsync(sql, param, uow.DbTransaction, commandTimeout, commandType);
+			uow.Uow.DbConnection.QueryAsync(sql, param, uow.Uow.DbTransaction, commandTimeout, commandType);
 
 
 		/// <summary>
@@ -660,9 +660,9 @@ namespace PH.DapperUtils.UnitOfWork
 		///     the first column in assumed, otherwise an instance is
 		///     created per row, and a direct column-name===member-name mapping is assumed (case insensitive).
 		/// </returns>
-		public static Task<IEnumerable<T>> QueryAsync<T>(this DapperBase uow, string sql, object param = null,
+		public static Task<IEnumerable<T>> QueryAsync<T>(this Crud uow, string sql, object param = null,
 		                                                 int? commandTimeout = null, CommandType? commandType = null) =>
-			uow.DbConnection.QueryAsync<T>(sql, param, uow.DbTransaction, commandTimeout, commandType);
+			uow.Uow.DbConnection.QueryAsync<T>(sql, param, uow.Uow.DbTransaction, commandTimeout, commandType);
 
 
 		/// <summary>
@@ -674,10 +674,10 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="param">The parameters to pass, if any.</param>
 		/// <param name="commandTimeout">The command timeout (in seconds).</param>
 		/// <param name="commandType">The type of command to execute.</param>
-		public static Task<T> QueryFirstAsync<T>(this DapperBase uow, string sql, object param = null,
+		public static Task<T> QueryFirstAsync<T>(this Crud uow, string sql, object param = null,
 		                                         int? commandTimeout = null,
 		                                         CommandType? commandType = null) =>
-			uow.DbConnection.QueryFirstAsync<T>(sql, param, uow.DbTransaction, commandTimeout, commandType);
+			uow.Uow.DbConnection.QueryFirstAsync<T>(sql, param, uow.Uow.DbTransaction, commandTimeout, commandType);
 
 		/// <summary>
 		///     Execute a single-row query asynchronously using Task.
@@ -689,9 +689,9 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="param">The parameters to pass, if any.</param>
 		/// <param name="commandTimeout">The command timeout (in seconds).</param>
 		/// <param name="commandType">The type of command to execute.</param>
-		public static Task<T> QueryFirstOrDefaultAsync<T>(this DapperBase uow, string sql, object param = null,
+		public static Task<T> QueryFirstOrDefaultAsync<T>(this Crud uow, string sql, object param = null,
 		                                                  int? commandTimeout = null, CommandType? commandType = null)
-			=> uow.DbConnection.QueryFirstOrDefaultAsync<T>(sql, param, uow.DbTransaction, commandTimeout,
+			=> uow.Uow.DbConnection.QueryFirstOrDefaultAsync<T>(sql, param, uow.Uow.DbTransaction, commandTimeout,
 			                                                commandType);
 
 		/// <summary>
@@ -703,9 +703,9 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="param">The parameters to pass, if any.</param>
 		/// <param name="commandTimeout">The command timeout (in seconds).</param>
 		/// <param name="commandType">The type of command to execute.</param>
-		public static Task<T> QuerySingleAsync<T>(this DapperBase uow, string sql, object param = null,
+		public static Task<T> QuerySingleAsync<T>(this Crud uow, string sql, object param = null,
 		                                          int? commandTimeout = null, CommandType? commandType = null) =>
-			uow.DbConnection.QuerySingleAsync<T>(sql, param, uow.DbTransaction, commandTimeout, commandType);
+			uow.Uow.DbConnection.QuerySingleAsync<T>(sql, param, uow.Uow.DbTransaction, commandTimeout, commandType);
 
 		/// <summary>
 		///     Execute a single-row query asynchronously using Task.
@@ -716,10 +716,10 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="param">The parameters to pass, if any.</param>
 		/// <param name="commandTimeout">The command timeout (in seconds).</param>
 		/// <param name="commandType">The type of command to execute.</param>
-		public static Task<T> QuerySingleOrDefaultAsync<T>(this DapperBase uow, string sql, object param = null,
+		public static Task<T> QuerySingleOrDefaultAsync<T>(this Crud uow, string sql, object param = null,
 		                                                   int? commandTimeout = null,
 		                                                   CommandType? commandType = null) =>
-			uow.DbConnection.QuerySingleOrDefaultAsync<T>(sql, param, uow.DbTransaction, commandTimeout, commandType);
+			uow.Uow.DbConnection.QuerySingleOrDefaultAsync<T>(sql, param, uow.Uow.DbTransaction, commandTimeout, commandType);
 
 		/// <summary>
 		///     Execute a single-row query asynchronously using Task.
@@ -729,9 +729,9 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="param">The parameters to pass, if any.</param>
 		/// <param name="commandTimeout">The command timeout (in seconds).</param>
 		/// <param name="commandType">The type of command to execute.</param>
-		public static Task<dynamic> QueryFirstAsync(this DapperBase uow, string sql, object param = null,
+		public static Task<dynamic> QueryFirstAsync(this Crud uow, string sql, object param = null,
 		                                            int? commandTimeout = null, CommandType? commandType = null)
-			=> uow.DbConnection.QueryFirstAsync(sql, param, uow.DbTransaction, commandTimeout, commandType);
+			=> uow.Uow.DbConnection.QueryFirstAsync(sql, param, uow.Uow.DbTransaction, commandTimeout, commandType);
 
 
 		/// <summary>
@@ -742,10 +742,10 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="param">The parameters to pass, if any.</param>
 		/// <param name="commandTimeout">The command timeout (in seconds).</param>
 		/// <param name="commandType">The type of command to execute.</param>
-		public static Task<dynamic> QueryFirstOrDefaultAsync(this DapperBase uow, string sql, object param = null,
+		public static Task<dynamic> QueryFirstOrDefaultAsync(this Crud uow, string sql, object param = null,
 		                                                     int? commandTimeout = null,
 		                                                     CommandType? commandType = null)
-			=> uow.DbConnection.QueryFirstOrDefaultAsync(sql, param, uow.DbTransaction, commandTimeout, commandType);
+			=> uow.Uow.DbConnection.QueryFirstOrDefaultAsync(sql, param, uow.Uow.DbTransaction, commandTimeout, commandType);
 
 		/// <summary>
 		///     Execute a single-row query asynchronously using Task.
@@ -755,9 +755,9 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="param">The parameters to pass, if any.</param>
 		/// <param name="commandTimeout">The command timeout (in seconds).</param>
 		/// <param name="commandType">The type of command to execute.</param>
-		public static Task<dynamic> QuerySingleAsync(this DapperBase uow, string sql, object param = null,
+		public static Task<dynamic> QuerySingleAsync(this Crud uow, string sql, object param = null,
 		                                             int? commandTimeout = null, CommandType? commandType = null)
-			=> uow.DbConnection.QuerySingleAsync(sql, param, uow.DbTransaction, commandTimeout, commandType);
+			=> uow.Uow.DbConnection.QuerySingleAsync(sql, param, uow.Uow.DbTransaction, commandTimeout, commandType);
 
 
 		/// <summary>
@@ -768,10 +768,10 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="param">The parameters to pass, if any.</param>
 		/// <param name="commandTimeout">The command timeout (in seconds).</param>
 		/// <param name="commandType">The type of command to execute.</param>
-		public static Task<dynamic> QuerySingleOrDefaultAsync(this DapperBase uow, string sql, object param = null,
+		public static Task<dynamic> QuerySingleOrDefaultAsync(this Crud uow, string sql, object param = null,
 		                                                      int? commandTimeout = null,
 		                                                      CommandType? commandType = null)
-			=> uow.DbConnection.QuerySingleOrDefaultAsync(sql, param, uow.DbTransaction, commandTimeout, commandType);
+			=> uow.Uow.DbConnection.QuerySingleOrDefaultAsync(sql, param, uow.Uow.DbTransaction, commandTimeout, commandType);
 
 		/// <summary>
 		///     Execute a query asynchronously using Task.
@@ -783,10 +783,10 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="commandTimeout">The command timeout (in seconds).</param>
 		/// <param name="commandType">The type of command to execute.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="type" /> is <c>null</c>.</exception>
-		public static Task<IEnumerable<object>> QueryAsync(this DapperBase uow, Type type, string sql,
+		public static Task<IEnumerable<object>> QueryAsync(this Crud uow, Type type, string sql,
 		                                                   object param = null, int? commandTimeout = null,
 		                                                   CommandType? commandType = null)
-			=> uow.DbConnection.QueryAsync(type, sql, param, uow.DbTransaction, commandTimeout, commandType);
+			=> uow.Uow.DbConnection.QueryAsync(type, sql, param, uow.Uow.DbTransaction, commandTimeout, commandType);
 
 
 		/// <summary>
@@ -799,9 +799,9 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="commandTimeout">The command timeout (in seconds).</param>
 		/// <param name="commandType">The type of command to execute.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="type" /> is <c>null</c>.</exception>
-		public static Task<object> QueryFirstAsync(this DapperBase uow, Type type, string sql, object param = null,
+		public static Task<object> QueryFirstAsync(this Crud uow, Type type, string sql, object param = null,
 		                                           int? commandTimeout = null, CommandType? commandType = null)
-			=> uow.DbConnection.QueryFirstAsync(type, sql, param, uow.DbTransaction, commandTimeout, commandType);
+			=> uow.Uow.DbConnection.QueryFirstAsync(type, sql, param, uow.Uow.DbTransaction, commandTimeout, commandType);
 
 
 		/// <summary>
@@ -814,10 +814,10 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="commandTimeout">The command timeout (in seconds).</param>
 		/// <param name="commandType">The type of command to execute.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="type" /> is <c>null</c>.</exception>
-		public static Task<object> QueryFirstOrDefaultAsync(this DapperBase uow, Type type, string sql,
+		public static Task<object> QueryFirstOrDefaultAsync(this Crud uow, Type type, string sql,
 		                                                    object param = null, int? commandTimeout = null,
 		                                                    CommandType? commandType = null) =>
-			uow.DbConnection.QueryFirstOrDefaultAsync(type, sql, param, uow.DbTransaction, commandTimeout,
+			uow.Uow.DbConnection.QueryFirstOrDefaultAsync(type, sql, param, uow.Uow.DbTransaction, commandTimeout,
 			                                          commandType);
 
 
@@ -831,9 +831,9 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="commandTimeout">The command timeout (in seconds).</param>
 		/// <param name="commandType">The type of command to execute.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="type" /> is <c>null</c>.</exception>
-		public static Task<object> QuerySingleAsync(this DapperBase uow, Type type, string sql, object param = null,
+		public static Task<object> QuerySingleAsync(this Crud uow, Type type, string sql, object param = null,
 		                                            int? commandTimeout = null, CommandType? commandType = null) =>
-			uow.DbConnection.QuerySingleAsync(type, sql, param, uow.DbTransaction, commandTimeout, commandType);
+			uow.Uow.DbConnection.QuerySingleAsync(type, sql, param, uow.Uow.DbTransaction, commandTimeout, commandType);
 
 		/// <summary>
 		///     Execute a single-row query asynchronously using Task.
@@ -845,10 +845,10 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="commandTimeout">The command timeout (in seconds).</param>
 		/// <param name="commandType">The type of command to execute.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="type" /> is <c>null</c>.</exception>
-		public static Task<object> QuerySingleOrDefaultAsync(this DapperBase uow, Type type, string sql,
+		public static Task<object> QuerySingleOrDefaultAsync(this Crud uow, Type type, string sql,
 		                                                     object param = null, int? commandTimeout = null,
 		                                                     CommandType? commandType = null) =>
-			uow.DbConnection.QuerySingleOrDefaultAsync(type, sql, param, uow.DbTransaction, commandTimeout,
+			uow.Uow.DbConnection.QuerySingleOrDefaultAsync(type, sql, param, uow.Uow.DbTransaction, commandTimeout,
 			                                           commandType);
 
 
@@ -861,12 +861,12 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="commandTimeout">Number of seconds before command execution timeout.</param>
 		/// <param name="commandType">Is it a stored proc or a batch?</param>
 		/// <returns>The number of rows affected.</returns>
-		public static Task<int> ExecuteAsync(this DapperBase uow, string sql, object param = null,
+		public static Task<int> ExecuteAsync(this Crud uow, string sql, object param = null,
 		                                     int? commandTimeout = null,
 		                                     CommandType? commandType = null)
 		{
 			uow.ThrowIfReadOnly();
-			return uow.DbConnection.ExecuteAsync(sql, param, uow.DbTransaction, commandTimeout, commandType);
+			return uow.Uow.DbConnection.ExecuteAsync(sql, param, uow.Uow.DbTransaction, commandTimeout, commandType);
 		}
 
 
@@ -886,10 +886,10 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="commandTimeout">Number of seconds before command execution timeout.</param>
 		/// <param name="commandType">Is it a stored proc or a batch?</param>
 		/// <returns>An enumerable of <typeparamref name="TReturn" />.</returns>
-		public static Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TReturn>(this DapperBase uow,
+		public static Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TReturn>(this Crud uow,
 		                                                                              string sql, Func<TFirst, TSecond, TReturn> map, object param = null, bool buffered = true,
 		                                                                              string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null) =>
-			uow.DbConnection.QueryAsync(sql, map, param, uow.DbTransaction, buffered,
+			uow.Uow.DbConnection.QueryAsync(sql, map, param, uow.Uow.DbTransaction, buffered,
 			                            splitOn,
 			                            commandTimeout, commandType);
 
@@ -912,10 +912,10 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="commandType">Is it a stored proc or a batch?</param>
 		/// <returns>An enumerable of <typeparamref name="TReturn" />.</returns>
 		public static Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TReturn>(
-			this DapperBase uow,
+			this Crud uow,
 			string sql, Func<TFirst, TSecond, TThird, TReturn> map, object param = null, bool buffered = true,
 			string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null) =>
-			uow.DbConnection.QueryAsync(sql, map, param, uow.DbTransaction,
+			uow.Uow.DbConnection.QueryAsync(sql, map, param, uow.Uow.DbTransaction,
 			                            buffered,
 			                            splitOn, commandTimeout, commandType);
 
@@ -939,10 +939,10 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="commandType">Is it a stored proc or a batch?</param>
 		/// <returns>An enumerable of <typeparamref name="TReturn" />.</returns>
 		public static Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TFourth, TReturn>(
-			this DapperBase uow,
+			this Crud uow,
 			string sql, Func<TFirst, TSecond, TThird, TFourth, TReturn> map, object param = null, bool buffered = true,
 			string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null) =>
-			uow.DbConnection.QueryAsync(sql, map, param, uow.DbTransaction,
+			uow.Uow.DbConnection.QueryAsync(sql, map, param, uow.Uow.DbTransaction,
 			                            buffered, splitOn, commandTimeout, commandType);
 
 
@@ -966,11 +966,11 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="commandType">Is it a stored proc or a batch?</param>
 		/// <returns>An enumerable of <typeparamref name="TReturn" />.</returns>
 		public static Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TFourth, TFifth, TReturn>(
-			this DapperBase uow,
+			this Crud uow,
 			string sql, Func<TFirst, TSecond, TThird, TFourth, TFifth, TReturn> map, object param = null,
 			bool buffered = true, string splitOn = "Id", int? commandTimeout = null, CommandType? commandType = null) =>
-			uow.DbConnection.QueryAsync(sql, map, param,
-			                            uow.DbTransaction, buffered, splitOn, commandTimeout, commandType);
+			uow.Uow.DbConnection.QueryAsync(sql, map, param,
+			                            uow.Uow.DbTransaction, buffered, splitOn, commandTimeout, commandType);
 
 
 		/// <summary>
@@ -994,12 +994,12 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="commandType">Is it a stored proc or a batch?</param>
 		/// <returns>An enumerable of <typeparamref name="TReturn" />.</returns>
 		public static Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TReturn>(
-			this DapperBase uow,
+			this Crud uow,
 			string sql, Func<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TReturn> map,
 			object param = null, bool buffered = true, string splitOn = "Id",
 			int? commandTimeout = null, CommandType? commandType = null) =>
-			uow.DbConnection.QueryAsync(sql, map, param,
-			                            uow.DbTransaction, buffered, splitOn, commandTimeout, commandType);
+			uow.Uow.DbConnection.QueryAsync(sql, map, param,
+			                            uow.Uow.DbTransaction, buffered, splitOn, commandTimeout, commandType);
 
 
 		/// <summary>
@@ -1024,14 +1024,14 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="commandType">Is it a stored proc or a batch?</param>
 		/// <returns>An enumerable of <typeparamref name="TReturn" />.</returns>
 		public static Task<IEnumerable<TReturn>>
-			QueryAsync<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh, TReturn>(this DapperBase uow,
+			QueryAsync<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh, TReturn>(this Crud uow,
 				string sql, Func<TFirst, TSecond, TThird, TFourth, TFifth, TSixth, TSeventh, TReturn> map,
 				object param = null, bool buffered = true, string splitOn = "Id", int? commandTimeout = null,
 				CommandType? commandType = null) =>
-			uow.DbConnection.QueryAsync(sql,
+			uow.Uow.DbConnection.QueryAsync(sql,
 			                            map,
 			                            param,
-			                            uow.DbTransaction, buffered, splitOn, commandTimeout, commandType);
+			                            uow.Uow.DbTransaction, buffered, splitOn, commandTimeout, commandType);
 
 
 		/// <summary>
@@ -1049,12 +1049,12 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="commandTimeout">Number of seconds before command execution timeout.</param>
 		/// <param name="commandType">Is it a stored proc or a batch?</param>
 		/// <returns>An enumerable of <typeparamref name="TReturn" />.</returns>
-		public static Task<IEnumerable<TReturn>> QueryAsync<TReturn>(this DapperBase uow, string sql, Type[] types,
+		public static Task<IEnumerable<TReturn>> QueryAsync<TReturn>(this Crud uow, string sql, Type[] types,
 		                                                             Func<object[], TReturn> map,
 		                                                             object param = null, bool buffered = true,
 		                                                             string splitOn = "Id", int? commandTimeout = null,
 		                                                             CommandType? commandType = null) =>
-			uow.DbConnection.QueryAsync(sql, types, map, param, uow.DbTransaction, buffered, splitOn,
+			uow.Uow.DbConnection.QueryAsync(sql, types, map, param, uow.Uow.DbTransaction, buffered, splitOn,
 			                            commandTimeout, commandType);
 
 
@@ -1067,9 +1067,9 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="commandTimeout">Number of seconds before command execution timeout.</param>
 		/// <param name="commandType">Is it a stored proc or a batch?</param>
 		/// <returns>The first cell returned, as <see cref="object" />.</returns>
-		public static Task<object> ExecuteScalarAsync(this DapperBase uow, string sql, object param = null,
+		public static Task<object> ExecuteScalarAsync(this Crud uow, string sql, object param = null,
 		                                              int? commandTimeout = null, CommandType? commandType = null) =>
-			uow.DbConnection.ExecuteScalarAsync(sql, param, uow.DbTransaction, commandTimeout, commandType);
+			uow.Uow.DbConnection.ExecuteScalarAsync(sql, param, uow.Uow.DbTransaction, commandTimeout, commandType);
 
 
 		/// <summary>
@@ -1082,10 +1082,10 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="commandTimeout">Number of seconds before command execution timeout.</param>
 		/// <param name="commandType">Is it a stored proc or a batch?</param>
 		/// <returns>The first cell returned, as <typeparamref name="T" />.</returns>
-		public static Task<T> ExecuteScalarAsync<T>(this DapperBase uow, string sql, object param = null,
+		public static Task<T> ExecuteScalarAsync<T>(this Crud uow, string sql, object param = null,
 		                                            int? commandTimeout = null,
 		                                            CommandType? commandType = null) =>
-			uow.DbConnection.ExecuteScalarAsync<T>(sql, param, uow.DbTransaction, commandTimeout, commandType);
+			uow.Uow.DbConnection.ExecuteScalarAsync<T>(sql, param, uow.Uow.DbTransaction, commandTimeout, commandType);
 
 
 		/// <summary>
@@ -1098,9 +1098,9 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="id">Id of the entity to get, must be marked with [Key] attribute</param>
 		/// <param name="commandTimeout">Number of seconds before command execution timeout</param>
 		/// <returns>Entity of T</returns>
-		public static Task<T> GetAsync<T>(this DapperBase uow, dynamic id, int? commandTimeout = null)
+		public static Task<T> GetAsync<T>(this Crud uow, dynamic id, int? commandTimeout = null)
 			where T : class =>
-			SqlMapperExtensions.GetAsync<T>(uow.DbConnection, id, uow.DbTransaction,
+			SqlMapperExtensions.GetAsync<T>(uow.Uow.DbConnection, id, uow.Uow.DbTransaction,
 			                                commandTimeout);
 
 		/// <summary>
@@ -1113,27 +1113,24 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="uow">Unit Of Work</param>
 		/// <param name="commandTimeout">Number of seconds before command execution timeout</param>
 		/// <returns>Entity of T</returns>
-		public static async Task<IEnumerable<T>> GetAllAsync<T>(this DapperBase uow, int? commandTimeout = null)
-			where T : class => await uow.DbConnection.GetAllAsync<T>(uow.DbTransaction, commandTimeout);
+		public static async Task<IEnumerable<T>> GetAllAsync<T>(this Crud uow, int? commandTimeout = null)
+			where T : class => await uow.Uow.DbConnection.GetAllAsync<T>(uow.Uow.DbTransaction, commandTimeout);
 
 
 		/// <summary>
-		///     Inserts an entity into table "Ts" asynchronously using Task and returns identity id.
+		///     Inserts an entity into table "Ts" asynchronously using Task and returns inserted.
 		/// </summary>
 		/// <typeparam name="T">The type being inserted.</typeparam>
 		/// <param name="uow">Unit Of Work</param>
 		/// <param name="entityToInsert">Entity to insert</param>
 		/// <param name="commandTimeout">Number of seconds before command execution timeout</param>
-		/// <param name="sqlAdapter">The specific ISqlAdapter to use, auto-detected based on connection if null</param>
-		/// <returns>Identity of inserted entity</returns>
-		public static Task<int> InsertAsync<T>(this DapperBase uow, T entityToInsert, int? commandTimeout = null,
-		                                       ISqlAdapter sqlAdapter = null)
+        /// <returns>inserted entity</returns>
+		public static Task<T> InsertAsync<T>(this Crud uow, T entityToInsert, int? commandTimeout = null)
 			where T : class
 		{
 			uow.ThrowIfReadOnly();
-			return uow.DbConnection.InsertAsync(entityToInsert,
-			                                    uow.DbTransaction, commandTimeout, sqlAdapter);
-		}
+            return uow.InsertEntityAsync(entityToInsert, commandTimeout);
+        }
 
 		/// <summary>
 		///     Updates entity in table "Ts" asynchronously using Task, checks if the entity is modified if the entity is tracked
@@ -1144,12 +1141,12 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="entityToUpdate">Entity to be updated</param>
 		/// <param name="commandTimeout">Number of seconds before command execution timeout</param>
 		/// <returns>true if updated, false if not found or not modified (tracked entities)</returns>
-		public static Task<bool> UpdateAsync<T>(this DapperBase uow, T entityToUpdate, int? commandTimeout = null)
+		public static Task<bool> UpdateAsync<T>(this Crud uow, T entityToUpdate, int? commandTimeout = null)
 			where T : class
 		{
 			uow.ThrowIfReadOnly();
-			return uow.DbConnection.UpdateAsync(entityToUpdate,
-			                                    uow.DbTransaction, commandTimeout);
+			return uow.Uow.DbConnection.UpdateAsync(entityToUpdate,
+			                                    uow.Uow.DbTransaction, commandTimeout);
 		}
 
 		/// <summary>
@@ -1160,10 +1157,10 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="entityToDelete">Entity to delete</param>
 		/// <param name="commandTimeout">Number of seconds before command execution timeout</param>
 		/// <returns>true if deleted, false if not found</returns>
-		public static Task<bool> DeleteAsync<T>(this DapperBase uow, T entityToDelete, int? commandTimeout = null)
+		public static Task<bool> DeleteAsync<T>(this Crud uow, T entityToDelete, int? commandTimeout = null)
 			where T : class =>
-			uow.DbConnection.DeleteAsync(entityToDelete,
-			                             uow.DbTransaction, commandTimeout);
+			uow.Uow.DbConnection.DeleteAsync(entityToDelete,
+			                             uow.Uow.DbTransaction, commandTimeout);
 
 		/// <summary>
 		///     Delete all entities in the table related to the type T asynchronously using Task.
@@ -1172,8 +1169,8 @@ namespace PH.DapperUtils.UnitOfWork
 		/// <param name="uow">Unit Of Work</param>
 		/// <param name="commandTimeout">Number of seconds before command execution timeout</param>
 		/// <returns>true if deleted, false if none found</returns>
-		public static Task<bool> DeleteAllAsync<T>(this DapperBase uow, int? commandTimeout = null) where T : class =>
-			uow.DbConnection.DeleteAllAsync<T>(uow.DbTransaction,
+		public static Task<bool> DeleteAllAsync<T>(this Crud uow, int? commandTimeout = null) where T : class =>
+			uow.Uow.DbConnection.DeleteAllAsync<T>(uow.Uow.DbTransaction,
 			                                   commandTimeout);
 
 		#endregion

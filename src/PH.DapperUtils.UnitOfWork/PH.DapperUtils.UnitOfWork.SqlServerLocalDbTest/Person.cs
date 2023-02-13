@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -31,6 +32,7 @@ namespace PH.DapperUtils.UnitOfWork.SqlServerLocalDbTest
 	public class ClassRoom
 	{
 		[Key]
+		[DatabaseGenerated(DatabaseGeneratedOption.None)]
 		public Guid   Id   { get; set; }
 		public string Name { get; set; }
 
@@ -48,6 +50,7 @@ namespace PH.DapperUtils.UnitOfWork.SqlServerLocalDbTest
 	public class Student
 	{
 		[Key]
+		[DatabaseGenerated(DatabaseGeneratedOption.None)]
 		public Guid Id { get; set; }
 
 		public int PersonId { get; set; }
@@ -64,4 +67,15 @@ namespace PH.DapperUtils.UnitOfWork.SqlServerLocalDbTest
 		/// </value>
 		internal static string SqlAll => $"select Id, PersonId, ClassRoomId from {Table}";
 	}
+
+    public class StudentExt : Student
+    {
+        public ClassRoom ClassRoom { get; set; }
+    }
+
+
+    public class ClassRoomExt : ClassRoom
+    {
+        public List<Student> Students { get; set; }
+    }
 }

@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,7 +16,7 @@ namespace PH.DapperUtils.UnitOfWork
 	///
 	/// <para>Wrapper for Hide <see cref="IDbConnection"/> and <see cref="IDbTransaction"/> exposing only dapper method for data manipulation</para>
 	///
-	/// <para><see cref="DapperBase"/> provide internal access for <see cref="IDbConnection">connection</see> and related <see cref="IDbTransaction">transaction</see> to <see cref="DapperUnitOfWorkSqlMapper"/> </para>
+	/// <para><see cref="DapperBase"/> provide internal access for <see cref="IDbConnection">connection</see> and related <see cref="IDbTransaction">transaction</see> to <see cref="CrudSqlMapper"/> </para>
 	/// </summary>
 	public abstract class DapperBase : IDisposable
 	{
@@ -107,10 +110,17 @@ namespace PH.DapperUtils.UnitOfWork
 			CancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(new []{ cancellationToken });
 			CancellationToken       = CancellationTokenSource.Token;
 
-			Active                  = true;
-		}
+			Active        = true;
+            DictionaryMap = new MapConfig();
 
-		internal bool IfReadOnly()
+        }
+
+        public void SetMapConfig(MapConfig cfg)
+        {
+            DictionaryMap = cfg;
+        }
+
+        internal bool IfReadOnly()
 		{
 			switch (DbTransaction.IsolationLevel)
 			{
@@ -164,5 +174,88 @@ namespace PH.DapperUtils.UnitOfWork
 			Dispose(true);
 			GC.SuppressFinalize(this);
 		}
-	}
+
+
+
+        #region Map / Fields configuration
+
+        internal MapConfig DictionaryMap;
+
+
+        internal TableConfig GetTableConfigConfig<T>(T entity) where T : class
+        {
+            var eType = entity.GetType();
+            if (!DictionaryMap.Tables.ContainsKey(eType))
+            {
+                var props = eType.GetProperties();
+                var l     = new List<FieldConfig>();
+                foreach (var propertyInfo in props)
+                {
+                    var parameter   = Expression.Parameter(eType);
+                    var property    = Expression.Property(parameter, propertyInfo);
+                    var conversion  = Expression.Convert(property, typeof(object));
+                    var fnc         = (Expression.Lambda<Func<T, object>>(conversion, parameter)).Compile();
+
+                    bool isKey = false;
+                    bool isAssigned = false;
+                    var keyAttr = propertyInfo.GetCustomAttribute<System.ComponentModel.DataAnnotations.KeyAttribute>();
+                    if (keyAttr != null)
+                    {
+                        isKey = true;
+                    }
+
+                    if (!isKey)
+                    {
+                        var k2 = propertyInfo.GetCustomAttribute<Dapper.Contrib.Extensions.KeyAttribute>();
+                        if (k2 != null)
+                        {
+                            isKey = true;
+                        }
+                    }
+
+                    if (isKey)
+                    {
+                        var dbGen = propertyInfo.GetCustomAttribute<DatabaseGeneratedAttribute>();
+                        if (null != dbGen)
+                        {
+                            if (dbGen.DatabaseGeneratedOption == DatabaseGeneratedOption.None)
+                            {
+                                isAssigned = true;
+                            }
+                        }
+
+
+                        var fieldConfig = new KeyConfig<T>(fnc, propertyInfo.Name,isAssigned);
+
+                        l.Add(fieldConfig);
+
+                    }
+                    else
+                    {
+                        var fieldConfig = new FieldConfig<T>(fnc, propertyInfo.Name);
+
+                        l.Add(fieldConfig);    
+                    }
+
+
+                    
+                }
+
+                var tbl = $"{eType.Name.ToLowerInvariant()}";
+                if (!tbl.EndsWith("s", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    tbl = $"{tbl}s";
+                }
+
+                DictionaryMap.Tables.Add(eType, new TableConfig() { TableName = tbl, Fields = l.ToArray() });
+            }
+
+            return DictionaryMap.Tables[eType];
+        }
+
+       
+
+
+        #endregion
+    }
 }

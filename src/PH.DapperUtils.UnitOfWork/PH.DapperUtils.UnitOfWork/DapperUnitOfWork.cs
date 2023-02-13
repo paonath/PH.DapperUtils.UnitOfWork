@@ -6,10 +6,13 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
+using System.Security;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
-
+using Dapper;
+using Dapper.Contrib.Extensions;
 #endregion
 
 namespace PH.DapperUtils.UnitOfWork
@@ -100,5 +103,95 @@ namespace PH.DapperUtils.UnitOfWork
 			 DbTransaction.Rollback();
 			 
 		}
+
+
+
+		 #region INSERT / UPDATE / DELETE
+
+         internal virtual async Task<T> InsertEntityAsync<T>(T entity, int? commandTimeout = null)
+            where T : class
+        {
+            var fields = this.GetTableConfigConfig(entity);
+
+            if (fields.CanUseDapperContrib)
+            {
+                this.ThrowIfReadOnly();
+                await this.DbConnection.InsertAsync(entity,
+                                                        this.DbTransaction, commandTimeout);
+                return entity;
+            }
+
+            var insert = fields.BuildInsert(entity);
+
+            await this.DbConnection.ExecuteAsync(insert, entity, this.DbTransaction, commandTimeout);
+            var result = await Read(entity, commandTimeout);
+            return result;
+        }
+
+         protected internal async Task<T> Read<T>(T entity, int? commandTimeout = null) where T : class
+         {
+             var fields      = this.GetTableConfigConfig(entity);
+             var whereBinded = fields.BuildWhereBinded(entity);
+             var query       = $"{fields.BuildSelect()} {whereBinded.SqlWhere} ;";
+             var entityRead =
+                 await this.DbConnection.QuerySingleOrDefaultAsync<T>(query, whereBinded.WhereParam,
+                                                                      this.DbTransaction,
+                                                                      commandTimeout, CommandType.Text);
+             return entityRead;
+         }
+
+         internal async virtual Task<T> UpdateEntityAsync<T>(T entity,  int? commandTimeout = null)
+            where T : class
+        {
+            await this.DbConnection.UpdateAsync(entity,
+                                                    this.DbTransaction, commandTimeout);
+            return entity;
+        }
+
+        internal async virtual Task<bool> DeleteEntityAsync<T>(T entity, int? commandTimeout = null)
+            where T : class
+        {
+            return await this.DbConnection.DeleteAsync(entity, this.DbTransaction, commandTimeout);
+        }
+
+        internal  async virtual Task<bool> DeleteEntityByIdAsync<T, TKey>(Func<TKey, Task<T>> entityById, TKey key, int? commandTimeout = null)
+            where T : class where TKey : IEquatable<TKey>
+        {
+            var e = await entityById.Invoke(key);
+            return await DeleteEntityAsync(e, commandTimeout);
+        }
+
+        internal virtual T Insert<T>(T entity, int? commandTimeout = null)
+            where T : class
+        {
+            var r = this.InsertEntityAsync(entity, commandTimeout).GetAwaiter().GetResult();
+            return r;
+        }
+
+        internal virtual T Update<T>(T entity, int? commandTimeout = null)
+            where T : class
+        {
+            var r = this.UpdateEntityAsync(entity, commandTimeout).GetAwaiter().GetResult();
+            return r;
+        }
+
+
+        internal virtual bool DeleteEntity<T>(T entity, int? commandTimeout = null)
+            where T : class
+        {
+            var r = this.DeleteEntityAsync(entity, commandTimeout).GetAwaiter().GetResult();
+            return r;
+        }
+
+        internal virtual bool DeleteEntityById<T, TKey>(Func<TKey, Task<T>> entityById, TKey key, int? commandTimeout = null)
+            where T : class where TKey : IEquatable<TKey>
+        {
+            var r = DeleteEntityByIdAsync<T,TKey>(entityById, key, commandTimeout).GetAwaiter().GetResult();
+            return r;
+        }
+
+        #endregion
 	}
+
+    
 }
