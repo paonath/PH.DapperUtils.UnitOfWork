@@ -67,10 +67,10 @@ namespace PH.DapperUtils.UnitOfWork
         }
     }
 
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
-    public class ExcludedFieldAttribute : Attribute
-    {
-    }
+    //[AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+    //public class ExcludedFieldAttribute : Attribute
+    //{
+    //}
 
     public class TableConfig
     {
@@ -92,18 +92,23 @@ namespace PH.DapperUtils.UnitOfWork
         /// </value>
         public FieldConfig[] Fields    { get; set; }
 
-        internal bool CanUseDapperContrib => GetCanUseDapperContrib();
+        internal bool CanUseDapperContrib => _canUseDapperContrib ?? GetCanUseDapperContrib();
+
+        private bool? _canUseDapperContrib;
 
         private bool GetCanUseDapperContrib()
         {
+            
             if (CustomSetup)
             {
-                return false;
+                _canUseDapperContrib = false;
+                return _canUseDapperContrib.Value;
             }
 
             var key      = Fields.Count(x => x.IsKey);
             var assigned = Fields.Count(x => x.IsAssignedIfKey);
-            return key > 0 && assigned == 0;
+            _canUseDapperContrib = key > 0 && assigned == 0;
+            return _canUseDapperContrib.Value;
         }
 
         internal string BuildSelect()
@@ -134,6 +139,10 @@ namespace PH.DapperUtils.UnitOfWork
             {
                 sql.AppendFormat(" where {0} = @{1}", keys[0].SqlFieldName,
                                  keys[0].PropertyName);
+                if (null != entity)
+                {
+                    param.Add(keys[0].PropertyName, keys[0].GetValue(entity));
+                }
             }
             else
             {

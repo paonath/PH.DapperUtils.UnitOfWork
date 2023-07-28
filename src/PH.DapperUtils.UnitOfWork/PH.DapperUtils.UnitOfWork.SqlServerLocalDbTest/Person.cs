@@ -32,8 +32,8 @@ namespace PH.DapperUtils.UnitOfWork.SqlServerLocalDbTest
 		public string? FirstName { get; set; }
 		public string? LastName  { get; set; }
 
-        [ExcludedField]
-        public Guid? NotMappedField { get; set; }
+        //[ExcludedField]
+        //public Guid? NotMappedField { get; set; }
 
 
 		

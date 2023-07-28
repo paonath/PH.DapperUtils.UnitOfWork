@@ -188,11 +188,11 @@ namespace PH.DapperUtils.UnitOfWork
                 var l             = new List<FieldConfig>();
                 foreach (var propertyInfo in props)
                 {
-				    var excluded = propertyInfo.GetCustomAttribute<ExcludedFieldAttribute>();
-                    if (null != excluded)
-                    {
-                        continue;
-                    }
+				    //var excluded = propertyInfo.GetCustomAttribute<ExcludedFieldAttribute>();
+        //            if (null != excluded)
+        //            {
+        //                continue;
+        //            }
 
                     var byAttr = propertyInfo.GetCustomAttribute<FieldNameAttribute>();
                     if (null != byAttr)
