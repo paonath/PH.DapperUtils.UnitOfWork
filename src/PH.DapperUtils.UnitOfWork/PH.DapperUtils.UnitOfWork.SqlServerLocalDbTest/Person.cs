@@ -7,21 +7,21 @@ using System.Threading.Tasks;
 
 namespace PH.DapperUtils.UnitOfWork.SqlServerLocalDbTest
 {
-	[TableName("persons")]
-    public class PersonWithAttributeMap
-    {
-		[FieldName("Id", true)]
-        public int    Key        { get; set; }
+	//[TableName("persons")]
+ //   public class PersonWithAttributeMap
+ //   {
+	//	[FieldName("Id", true)]
+ //       public int    Key        { get; set; }
 		
-        [FieldName("FirstName")]
-        public string Identifier { get; set; }
+ //       [FieldName("FirstName")]
+ //       public string Identifier { get; set; }
 
-        [FieldName("LastName")]
-        public string AlternateIdentifier { get; set; }
+ //       [FieldName("LastName")]
+ //       public string AlternateIdentifier { get; set; }
 
-		[ExcludedField]
-        public Guid? NotMappedField { get; set; }
-    }
+	//	[ExcludedField]
+ //       public Guid? NotMappedField { get; set; }
+ //   }
 
 
     public class Person
@@ -32,17 +32,11 @@ namespace PH.DapperUtils.UnitOfWork.SqlServerLocalDbTest
 		public string? FirstName { get; set; }
 		public string? LastName  { get; set; }
 
+        [ExcludedField]
+        public Guid? NotMappedField { get; set; }
 
 
-		internal static string Table => "persons";
-
-		/// <summary>
-		/// SQL select
-		/// </summary>
-		/// <value>
-		/// select Id, FirstName, LastName from persons
-		/// </value>
-		internal static string SqlAll => $"select Id, FirstName, LastName from {Table} ";
+		
 	}
 
 

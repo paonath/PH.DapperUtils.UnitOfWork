@@ -10,6 +10,13 @@ namespace PH.DapperUtils.UnitOfWork
     /// </summary>
     public class FieldConfig
     {
+        /// <summary>
+        /// Gets or sets the name of the c# object property.
+        /// </summary>
+        /// <value>
+        /// The name of the property.
+        /// </value>
+        internal string PropertyName { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the SQL field.
@@ -43,7 +50,7 @@ namespace PH.DapperUtils.UnitOfWork
     {
         public static object GetValue<T>(this FieldConfig fg, T instance) where T : class
         {
-            var propAccesor = instance.GetType().GetProperties().First(x => x.Name == fg.SqlFieldName);
+            var propAccesor = instance.GetType().GetProperties().First(x => x.Name == fg.PropertyName);
             return propAccesor.GetValue(instance, null);
         }
 

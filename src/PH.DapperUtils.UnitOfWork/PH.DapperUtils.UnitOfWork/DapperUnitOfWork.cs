@@ -143,8 +143,20 @@ namespace PH.DapperUtils.UnitOfWork
          internal async virtual Task<T> UpdateEntityAsync<T>(T entity,  int? commandTimeout = null)
             where T : class
         {
-            await this.DbConnection.UpdateAsync(entity,
+            var fields = this.GetTableConfigConfig(entity);
+            if (fields.CanUseDapperContrib)
+            {
+                await this.DbConnection.UpdateAsync(entity,
                                                     this.DbTransaction, commandTimeout);
+            }
+            else
+            {
+                var update = fields.BuildUpdate(entity);
+                await this.DbConnection.ExecuteAsync(update, entity, this.DbTransaction, commandTimeout);
+               
+            }
+
+            
             return entity;
         }
 

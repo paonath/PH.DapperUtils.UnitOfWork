@@ -74,6 +74,8 @@ namespace PH.DapperUtils.UnitOfWork
 
     public class TableConfig
     {
+        public bool CustomSetup { get; internal set; }
+
         /// <summary>
         /// Gets or sets the name of the SQL table.
         /// </summary>
@@ -94,6 +96,11 @@ namespace PH.DapperUtils.UnitOfWork
 
         private bool GetCanUseDapperContrib()
         {
+            if (CustomSetup)
+            {
+                return false;
+            }
+
             var key      = Fields.Count(x => x.IsKey);
             var assigned = Fields.Count(x => x.IsAssignedIfKey);
             return key > 0 && assigned == 0;
@@ -120,18 +127,30 @@ namespace PH.DapperUtils.UnitOfWork
         internal (string SqlWhere, object WhereParam) BuildWhereBinded<T>(T entity) where T : class
         {
             StringBuilder sql = new StringBuilder();
-            sql.Append(" where 1=1");
+            
             var param = new Dictionary<string, object>();
-            foreach (var fieldConfig in Fields.Where(x => x.IsKey))
+            var keys  = Fields.Where(x => x.IsKey).OrderBy(x => x.SqlFieldName).ToArray();
+            if (keys.Length == 1)
             {
-                sql.AppendFormat(" and {0} = @{1}", fieldConfig.SqlFieldName,
-                                 fieldConfig.SqlFieldName.ToUpperInvariant());
-                if (null != entity)
-                {
-                    param.Add(fieldConfig.SqlFieldName.ToUpperInvariant(), fieldConfig.GetValue(entity));
-                }
-
+                sql.AppendFormat(" where {0} = @{1}", keys[0].SqlFieldName,
+                                 keys[0].PropertyName);
             }
+            else
+            {
+                sql.Append(" where 1=1");
+                foreach (var fieldConfig in keys)
+                {
+                    sql.AppendFormat(" and {0} = @{1}", fieldConfig.SqlFieldName,
+                                     fieldConfig.PropertyName);
+                    if (null != entity)
+                    {
+                        param.Add(fieldConfig.PropertyName, fieldConfig.GetValue(entity));
+                    }
+
+                }
+            }
+
+            
 
             return (sql.ToString(), param);
         }
@@ -142,14 +161,44 @@ namespace PH.DapperUtils.UnitOfWork
 
 
             sql.AppendFormat(" insert into {0} (", TableName);
-            var fieldsToInsert = Fields.Where(x => !x.IsKey || x.IsAssignedIfKey).Select(x => x.SqlFieldName)
-                                       .OrderBy(x => x)
+            var fieldsToInsert = Fields.Where(x => !x.IsKey || x.IsAssignedIfKey)
+                                       .OrderBy(x => x.SqlFieldName)
                                        .ToArray();
-            sql.AppendFormat(" {0} )", string.Join(", ", fieldsToInsert));
+            sql.AppendFormat(" {0} )", string.Join(", ", fieldsToInsert.Select(x => x.SqlFieldName)));
 
             sql.Append(" values (");
 
-            sql.AppendFormat(" {0} )", string.Join(", ", fieldsToInsert.Select(x => $"@{x}")));
+            sql.AppendFormat(" {0} )", string.Join(", ", fieldsToInsert.Select(x => $"@{x.PropertyName}")));
+
+            return sql.ToString();
+        }
+
+        internal string BuildUpdate<T>(T entity) where T : class
+        {
+            StringBuilder sql = new StringBuilder();
+            sql.AppendFormat(" update {0} SET ", TableName);
+
+            var fieldsToInsert = Fields.Where(x => !x.IsKey || x.IsAssignedIfKey)
+                                       .OrderBy(x => x.SqlFieldName)
+                                       .ToArray();
+            bool first = true;
+            foreach (var fieldConfig in fieldsToInsert)
+            {
+                
+
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    sql.Append(" , ");
+                }
+
+                sql.AppendFormat(" {0} = @{1} ", fieldConfig.SqlFieldName, fieldConfig.PropertyName);
+            }
+
+            sql.AppendFormat(" {0}", BuildWhere());
 
             return sql.ToString();
         }

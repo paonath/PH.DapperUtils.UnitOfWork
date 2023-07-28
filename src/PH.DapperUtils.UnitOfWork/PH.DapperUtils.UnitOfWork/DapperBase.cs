@@ -183,19 +183,22 @@ namespace PH.DapperUtils.UnitOfWork
 
         private  TableConfig RuntimeBuildTableConfigForType<T>(T entity, Type eType) where T : class
         {
-                var props = eType.GetProperties();
-                var l     = new List<FieldConfig>();
+            bool    isCustomSetup = false;
+                var props         = eType.GetProperties();
+                var l             = new List<FieldConfig>();
                 foreach (var propertyInfo in props)
                 {
 				    var excluded = propertyInfo.GetCustomAttribute<ExcludedFieldAttribute>();
                     if (null != excluded)
                     {
-						continue;
+                        continue;
                     }
 
                     var byAttr = propertyInfo.GetCustomAttribute<FieldNameAttribute>();
                     if (null != byAttr)
                     {
+                        isCustomSetup             = propertyInfo.Name.ToUpperInvariant() != byAttr.Field.SqlFieldName;
+                        byAttr.Field.PropertyName = propertyInfo.Name;
 						l.Add(byAttr.Field);
 						continue;
                     }
@@ -235,6 +238,7 @@ namespace PH.DapperUtils.UnitOfWork
 
 
                         var fieldConfig = new KeyConfig<T>(fnc, propertyInfo.Name,isAssigned);
+                        fieldConfig.PropertyName = propertyInfo.Name;
 
                         l.Add(fieldConfig);
 
@@ -242,6 +246,7 @@ namespace PH.DapperUtils.UnitOfWork
                     else
                     {
                         var fieldConfig = new FieldConfig<T>(fnc, propertyInfo.Name);
+                        fieldConfig.PropertyName = propertyInfo.Name;
 
                         l.Add(fieldConfig);    
                     }
@@ -253,7 +258,7 @@ namespace PH.DapperUtils.UnitOfWork
                 var tblNameAttr = eType.GetCustomAttribute<TableNameAttribute>();
                 if (null != tblNameAttr)
                 {
-                    return new TableConfig() { TableName = tblNameAttr.TableName, Fields = l.ToArray() };
+                    return new TableConfig() { TableName = tblNameAttr.TableName, Fields = l.ToArray(), CustomSetup = isCustomSetup};
                 }
 
 
@@ -263,7 +268,7 @@ namespace PH.DapperUtils.UnitOfWork
                     tbl = $"{tbl}s";
                 }
 
-                return new TableConfig() { TableName = tbl, Fields = l.ToArray() };
+                return new TableConfig() { TableName = tbl, Fields = l.ToArray(), CustomSetup = isCustomSetup };
 
         }
 
